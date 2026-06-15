@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>朝为田舍埋头郎—我的农场 V14.6 独立版</title>
+<style>
+:root{--green:#78b66b;--deep:#31533a;--cream:#fff9ec;--line:#e5dfcf;--red:#d66b5f;--gold:#d39b42;--brown:#9b6a3e}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(#e7f6dc,#fff3d8);color:#314033}.cover{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at top,#fff9d8,#dff0d2 45%,#b9dca8)}.coverCard{width:min(520px,100%);text-align:center;background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.95);border-radius:28px;padding:42px 24px;box-shadow:0 16px 50px rgba(49,83,58,.18)}.cover h1{font-size:29px;color:var(--deep);margin:0 0 28px}#game{display:none}header{position:sticky;top:0;z-index:9;background:rgba(255,249,236,.94);backdrop-filter:blur(8px);padding:12px 14px;border-bottom:1px solid var(--line)}h1{font-size:21px;margin:0 0 8px;color:var(--deep)}.topbar{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;font-size:13px}.pill,.badge{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 9px;text-align:center}.badge{display:inline-block;margin:3px;font-size:12px}main{padding:14px;max-width:1080px;margin:auto}nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}nav button{background:#fff;color:var(--deep);border:1px solid var(--line);box-shadow:none}nav button.active{background:var(--green);color:#fff;border:0;box-shadow:0 3px 0 rgba(49,83,58,.25)}button,select,input{font:inherit}button{border:0;border-radius:12px;padding:10px 12px;background:var(--green);color:#fff;font-weight:700;box-shadow:0 3px 0 rgba(49,83,58,.25);cursor:pointer}button.secondary{background:#fff;color:var(--deep);border:1px solid var(--line);box-shadow:none}button.small{padding:7px 9px;border-radius:9px;font-size:13px}button.danger{background:var(--red)}button:disabled{opacity:.45;cursor:not-allowed}.section{display:none}.section.active{display:block}.card{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 6px 20px rgba(88,70,25,.08)}.card h2,.card h3{margin:0 0 10px;color:var(--deep)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}.farmLand{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}.tile,.item{background:var(--cream);border:1px solid var(--line);border-radius:16px;padding:10px;min-height:116px;text-align:center}.tile{background:#87bd70;color:#fff}.empty{background:#caa271}.locked{background:#8a7356}.lockedItem{filter:grayscale(1);opacity:.48;background:#eee}.emoji{font-size:34px;line-height:1.1;margin:5px 0}.muted{color:#78816e;font-size:13px}.tile .muted{color:#eef8e8}.bar{height:8px;background:rgba(0,0,0,.13);border-radius:99px;overflow:hidden;margin:8px 0}.bar span{display:block;height:100%;background:#fff5a7}.between{display:flex;align-items:center;justify-content:space-between;gap:8px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.log{background:#f8f3e4;border:1px dashed #d6caa9;border-radius:14px;padding:12px;margin-top:10px;white-space:pre-wrap}.priceBox{width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;margin:6px 0}.shopFold{border:1px solid var(--line);border-radius:14px;background:#fffdf6;margin:10px 0;padding:8px}.shopFold summary{cursor:pointer;font-weight:800;color:var(--deep);padding:8px}.shopTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.loading{animation:pulse 1s infinite alternate}@keyframes pulse{from{opacity:.45}to{opacity:1}}@media(max-width:680px){nav{grid-template-columns:repeat(3,1fr)}.topbar{grid-template-columns:repeat(2,1fr)}}
+.foldBox{border:1px solid var(--line);border-radius:14px;background:#fffdf6;margin:10px 0;overflow:hidden}.foldHead{padding:13px 14px;font-weight:800;color:var(--deep);cursor:pointer;display:flex;justify-content:space-between;align-items:center}.foldBody{display:none;padding:10px}.foldBox.open .foldBody{display:block}.foldArrow{font-size:13px;color:#78816e}
+.feedChoices{display:grid;grid-template-columns:1fr;gap:7px;margin:8px 0}.feedChoices button{width:100%;text-align:left;white-space:normal;line-height:1.35}.feedChoices .muted{font-weight:400}
+</style>
+</head>
+<body>
+<div class="cover" id="cover"><div class="coverCard"><div style="font-size:64px">🌾</div><h1>朝为田舍埋头郎</h1><button onclick="enterGame()">进入农场</button></div></div>
+<div id="game">
+<header><h1 id="farmTitle">🌿 我的农场</h1><div class="topbar"><div class="pill">金币：<b id="gold">0</b></div><div class="pill">等级：<b id="level">1</b></div><div class="pill">经验：<b id="exp">0</b>/<b id="needExp">100</b></div><div class="pill">天气：<b id="weather">晴天</b></div></div></header>
+<main>
+<nav><button class="active" data-tab="farm" onclick="showTab('farm')">农场</button><button data-tab="warehouse" onclick="showTab('warehouse')">仓库</button><button data-tab="order" onclick="showTab('order')">订单</button><button data-tab="market" onclick="showTab('market')">交易行</button><button data-tab="shop" onclick="showTab('shop')">商店</button><button data-tab="fish" onclick="showTab('fish')">钓鱼</button><button data-tab="animal" onclick="showTab('animal')">动物</button><button data-tab="daily" onclick="showTab('daily')">每日</button><button data-tab="tech" onclick="showTab('tech')">研究</button><button data-tab="book" onclick="showTab('book')">图鉴</button><button data-tab="stats" onclick="showTab('stats')">统计</button><button data-tab="notice" onclick="showTab('notice')">公告</button><button data-tab="savecenter" onclick="showTab('savecenter')">存档</button><button data-tab="logbook" onclick="showTab('logbook')">日志</button><button onclick="saveGame()">一键保存</button></nav>
+<section id="farm" class="section active"><div class="card"><div class="between"><h2 id="farmNameView">我的农场</h2><div class="row"><button class="small secondary" onclick="harvestAll()">一键收获</button><button class="small secondary" onclick="fertilizeAll()">一键施肥</button><button class="small secondary" onclick="batchPlant()">一键播种</button><button class="small secondary" onclick="renameFarm()">修改名字</button></div></div><p class="muted">开局只有部分土地，后续地块需要金币开垦。作物成熟后可收获、交订单或出售。</p><div id="seedPicker"></div><div class="farmLand" id="plots"></div></div></section>
+<section id="warehouse" class="section"><div class="card"><div class="between"><h2>仓库 Lv.<span id="warehouseLevel">1</span>｜容量 <span id="warehouseCap">0</span></h2><button class="small secondary" onclick="upgradeWarehouse()">扩建仓库</button></div><p class="muted">仓库按作物、鱼类、动物产品和消耗品分类，方便出售或上架。</p><div id="inventory"></div></div></section>
+<section id="order" class="section"><div class="card"><div class="between"><h2>卡车大订单</h2><button class="small secondary" onclick="tryRefreshOrders()">刷新订单</button></div><p class="muted">卡车订单按物品基础价×数量计算，耗时越久的农产品价值越高；卡车收益高，但每5分钟才会刷新。</p><div class="grid" id="orders"></div><div class="log" id="orderCd"></div></div></section>
+<section id="market" class="section"><div class="card"><div class="between"><h2>交易行</h2><button class="small secondary" onclick="tryRefreshMarket()">刷新交易行</button></div><p class="muted">交易行适合小额出售，别人售卖内容每5分钟刷新一次。</p><div class="shopTabs"><button onclick="marketView='buy';render()">购买</button><button onclick="marketView='sell';render()">我的摊位</button><button onclick="checkMySales()">查看售出</button></div><div id="marketArea"></div><div class="log" id="marketCd"></div></div></section>
+<section id="shop" class="section"><div class="card"><h2>农场商店</h2><p class="muted">点击分类标题可展开/折叠。种子和动物会显示全部种类，未解锁为灰色。</p><details class="shopFold"><summary>🌱 种子</summary><div class="grid" id="shopSeeds"></div></details><details class="shopFold"><summary>🐾 动物</summary><div class="grid" id="shopAnimals"></div></details><details class="shopFold"><summary>🛒 道具</summary><p class="muted">鱼饵、饲料、肥料分等级。贵的不一定最划算，但效果更强。</p><div class="grid" id="shopItems"></div></details></div></section>
+<section id="fish" class="section"><div class="card"><div class="between"><h2>月光湖钓鱼</h2><button class="small secondary" onclick="upgradePond()">扩建鱼塘</button></div><p class="muted">必须有鱼饵才能钓鱼。钓到鱼苗会自动投入鱼塘；鱼塘满了才会进入仓库。鱼塘里的鱼长成后会变成“成鱼·鱼名”，收入仓库后价值更高。</p><div class="row"><select id="baitSelect" class="priceBox" style="max-width:220px"></select><button onclick="goFishing()">挥杆钓鱼</button></div><div class="log" id="fishLog">湖面很安静。</div></div><div class="card"><div class="between"><h3>鱼塘 Lv.<span id="pondLevel">1</span>｜容量 <span id="pondCap">0</span></h3><button class="small secondary" onclick="storeAllPond()">一键收入仓库</button></div><div class="grid" id="pond"></div></div></section>
+<section id="animal" class="section"><div class="card"><div class="between"><h2>动物小屋 Lv.<span id="houseLevel">1</span>｜容量 <span id="houseCap">0</span></h2><div class="row"><button class="small secondary" onclick="collectAllAnimals()">一键收取产品</button><button class="small secondary" onclick="feedAllAnimals()">一键喂食</button><button class="small secondary" onclick="upgradeHouse()">扩建动物小屋</button></div></div><p class="muted">购入动物会从幼崽成长。幼年也需要喂饲料，只有在饲料生效时间里才会正常成长；成年后也只有在饲料生效时间里才会产出。</p><div class="grid" id="animals"></div></div></section>
+<section id="daily" class="section"><div class="card"><div class="between"><h2>每日任务</h2><button class="small secondary" onclick="refreshDailyTasks(true)">手动刷新</button></div><p class="muted">每天自动刷新，完成后可领取奖励。</p><div class="grid" id="dailyTasks"></div></div></section>
+<section id="tech" class="section"><div class="card"><h2>研究所</h2><p class="muted">通过持续研究改良农业、畜牧业和渔业技术，永久提升农场生产效率。</p><div id="techPanel"></div></div></section>
+<section id="book" class="section"><div class="card"><h2>图鉴与成就</h2><div id="bookPanel"></div></div></section>
+<section id="stats" class="section"><div class="card"><h2>统计面板</h2><p class="muted">记录你的农场经营轨迹。</p><div class="grid" id="statsPanel"></div></div></section>
+
+<section id="notice" class="section"><div class="card"><h2>更新公告</h2><div id="noticePanel"></div></div></section>
+<section id="savecenter" class="section"><div class="card"><h2>存档中心</h2><p class="muted">用于迁移、备份或重置农场。导出的存档是一整段文本，请妥善保存。</p><div class="grid"><div class="item"><div class="emoji">📤</div><b>导出存档</b><p class="muted">复制当前农场数据。</p><button class="small" onclick="exportSave()">导出</button></div><div class="item"><div class="emoji">📥</div><b>导入存档</b><p class="muted">粘贴旧存档文本恢复。</p><button class="small" onclick="importSave()">导入</button></div><div class="item"><div class="emoji">🧹</div><b>重置农场</b><p class="muted">清空当前进度，重新开始。</p><button class="small danger" onclick="resetFarm()">重置</button></div></div></div></section>
+<section id="logbook" class="section"><div class="card"><div class="between"><h2>农场日志</h2><button class="small secondary" onclick="clearFarmLogs()">清空日志</button></div><p class="muted">自动记录种植、收获、购买、订单、交易、钓鱼和动物产出等动态。</p><div id="farmLogs" class="log">暂无日志。</div></div></section>
+
+</main></div>
+<script>
+const SAVE_KEY='AI_FARM_SAVE_V11', SAVE_PREFIX='AI_FARM_SAVE_', SCHEMA_VERSION=18, FIVE=5*60*1000;
+const crops=[
+{name:'小麦',emoji:'🌾',time:60,seed:8,sell:18,level:1},{name:'水稻',emoji:'🌾',time:80,seed:12,sell:25,level:1},{name:'胡萝卜',emoji:'🥕',time:90,seed:16,sell:38,level:1},{name:'土豆',emoji:'🥔',time:150,seed:24,sell:58,level:2},{name:'玉米',emoji:'🌽',time:180,seed:30,sell:72,level:2},{name:'白菜',emoji:'🥬',time:210,seed:35,sell:86,level:3},{name:'番茄',emoji:'🍅',time:240,seed:38,sell:95,level:3},{name:'黄瓜',emoji:'🥒',time:260,seed:42,sell:108,level:3},{name:'辣椒',emoji:'🌶️',time:320,seed:52,sell:132,level:4},{name:'草莓',emoji:'🍓',time:360,seed:58,sell:150,level:4},{name:'棉花',emoji:'☁️',time:420,seed:70,sell:180,level:5},{name:'甘蔗',emoji:'🎋',time:460,seed:76,sell:205,level:5},{name:'南瓜',emoji:'🎃',time:520,seed:88,sell:240,level:6},{name:'葡萄',emoji:'🍇',time:620,seed:105,sell:300,level:7},{name:'西瓜',emoji:'🍉',time:760,seed:120,sell:360,level:8},{name:'蓝莓',emoji:'🫐',time:840,seed:145,sell:440,level:9},{name:'苹果',emoji:'🍎',time:960,seed:170,sell:520,level:10},{name:'咖啡豆',emoji:'☕',time:1080,seed:210,sell:680,level:12}
+];
+const animalsDef=[
+{name:'鸡',emoji:'🐔',baby:'小鸡仔',young:'半大鸡',adult:'母鸡',cost:420,product:'鸡蛋',productEmoji:'🥚',time:320,grow1:220,grow2:520,level:2},{name:'鸭',emoji:'🦆',baby:'小鸭仔',young:'小鸭',adult:'鸭子',cost:680,product:'鸭蛋',productEmoji:'🪺',time:440,grow1:300,grow2:700,level:3},{name:'兔子',emoji:'🐰',baby:'兔宝宝',young:'小兔',adult:'大兔子',cost:900,product:'兔毛',productEmoji:'🧶',time:600,grow1:380,grow2:880,level:4},{name:'牛',emoji:'🐄',baby:'小牛犊',young:'小牛',adult:'奶牛',cost:1500,product:'牛奶',productEmoji:'🥛',time:760,grow1:520,grow2:1200,level:5},{name:'羊',emoji:'🐑',baby:'羊宝宝',young:'小羊',adult:'大羊',cost:1900,product:'羊毛',productEmoji:'🧶',time:900,grow1:620,grow2:1450,level:6},{name:'山羊',emoji:'🐐',baby:'山羊宝宝',young:'小山羊',adult:'大山羊',cost:2500,product:'羊奶',productEmoji:'🥛',time:1080,grow1:760,grow2:1700,level:8}
+];
+const fishList=[
+{name:'鲫鱼',emoji:'🐟',sell:45,grow:300,level:1,rare:1},{name:'草鱼',emoji:'🐟',sell:65,grow:360,level:1,rare:1},{name:'鲤鱼',emoji:'🐟',sell:90,grow:420,level:2,rare:2},{name:'鲈鱼',emoji:'🐠',sell:130,grow:520,level:3,rare:2},{name:'黑鱼',emoji:'🐟',sell:160,grow:600,level:4,rare:3},{name:'鳜鱼',emoji:'🐠',sell:190,grow:700,level:4,rare:3},{name:'鲑鱼',emoji:'🐟',sell:230,grow:800,level:5,rare:3},{name:'鲟鱼',emoji:'🐡',sell:300,grow:920,level:6,rare:4},{name:'银龙鱼',emoji:'🐉',sell:460,grow:1100,level:8,rare:5},{name:'锦鲤',emoji:'🎏',sell:520,grow:1200,level:8,rare:5},{name:'金龙鱼',emoji:'🐉',sell:780,grow:1500,level:10,rare:6},{name:'月光鳗',emoji:'🌙',sell:980,grow:1800,level:12,rare:7}
+];
+const baits=[{name:'普通鱼饵',emoji:'🪱',cost:20,empty:.22,rare:0,desc:'便宜，偶尔空军'},{name:'香味鱼饵',emoji:'🪱',cost:55,empty:.16,rare:1,desc:'性价比高，空军较少'},{name:'高级鱼饵',emoji:'🪱',cost:120,empty:.10,rare:2,desc:'更容易出贵鱼'},{name:'秘制鱼饵',emoji:'✨',cost:260,empty:.05,rare:4,desc:'最贵，适合冲珍稀鱼'}];
+const feeds=[{name:'基础饲料',emoji:'🌽',cost:25,boost:1,duration:300,desc:'便宜，可维持5分钟，正常成长/产出'},{name:'营养饲料',emoji:'🥣',cost:70,boost:.75,duration:600,desc:'性价比高，可维持10分钟，成长/产出加快25%'},{name:'高级饲料',emoji:'🍯',cost:150,boost:.5,duration:900,desc:'昂贵，可维持15分钟，成长/产出加快50%'}];
+const fertilizers=[{name:'普通肥料',emoji:'🧪',cost:45,cut:.25,desc:'减少25%剩余生长时间'},{name:'速效肥料',emoji:'🧪',cost:95,cut:.5,desc:'性价比高，减少50%'},{name:'金坷垃肥料',emoji:'✨',cost:210,cut:.8,desc:'昂贵，减少80%'}];
+
+// 统一经济底层：所有可交易物品都从这里取价。时间越长、等级越高、越稀有，基础单价越高。
+function itemPrice(n){
+  const c=cropByName(n); if(c) return c.sell;
+  const f=fishByName(n); if(f) return f.sell; if(n&&String(n).includes('成鱼·')){
+    let q=0, raw=String(n);
+    if(raw.startsWith('优质·'))q=1;
+    if(raw.startsWith('珍稀·'))q=2;
+    if(raw.startsWith('传说·'))q=3;
+    let fname=raw.replace('优质·','').replace('珍稀·','').replace('传说·','').replace('成鱼·','');
+    let af=fishByName(fname); if(af) return Math.floor(af.sell*1.8*qualityMul(q));
+  }
+  const animalProduct={
+    '鸡蛋':48,
+    '鸭蛋':72,
+    '兔毛':118,
+    '牛奶':155,
+    '羊毛':210,
+    '羊奶':265
+  };
+  if(animalProduct[n]) return Math.floor(animalProduct[n]*(1+animalValueBoost()));
+  const seed=crops.find(c=>seedKey(c.name)===n); if(seed) return Math.max(1,Math.floor(seed.seed*0.35));
+  const tool=[...baits,...feeds,...fertilizers].find(x=>x.name===n); if(tool) return Math.max(1,Math.floor(tool.cost*0.45));
+  return 25;
+}
+function orderReward(need){
+  const base=need.reduce((sum,n)=>sum+itemPrice(n.name)*n.count,0);
+  const categoryBonus=need.length>=3?1.28:1.18;
+  const truckBonus=1.55;
+  return Math.max(80,Math.round(base*categoryBonus*truckBonus));
+}
+function marketPrice(n,count,mode='npc'){
+  const base=itemPrice(n)*count;
+  if(mode==='npc') return Math.max(8,Math.round(base*(0.72+Math.random()*0.28)));
+  return Math.max(5,Math.round(base*0.78));
+}
+const rods=[{name:'木鱼竿',emoji:'🎣',cost:0,level:1,bonus:0},{name:'铁鱼竿',emoji:'🎣',cost:600,level:4,bonus:1},{name:'银鱼竿',emoji:'🎣',cost:1500,level:7,bonus:2},{name:'金鱼竿',emoji:'🎣',cost:3600,level:10,bonus:3}];
+const achievements=[
+{id:'farm10',cat:'农场成长',name:'进阶农场主',emoji:'🏡',desc:'等级达到10级',done:s=>s.level>=10},
+{id:'warehouse5',cat:'农场成长',name:'囤货专家',emoji:'📦',desc:'仓库升到5级',done:s=>s.warehouseLevel>=5},
+{id:'house3',cat:'农场成长',name:'宽敞牧舍',emoji:'🏠',desc:'动物小屋升到3级',done:s=>s.houseLevel>=3},
+{id:'pond3',cat:'农场成长',name:'大鱼塘',emoji:'🌊',desc:'鱼塘升到3级',done:s=>s.pondLevel>=3},
+{id:'harvest20',cat:'农场成长',name:'勤劳农夫',emoji:'🌾',desc:'累计收获20份作物',done:s=>s.stats.harvests>=20},
+{id:'order1',cat:'订单经营',name:'初次发车',emoji:'🚚',desc:'完成1笔卡车订单',done:s=>s.stats.orders>=1},
+{id:'order10',cat:'订单经营',name:'交易大亨',emoji:'💰',desc:'完成10笔卡车订单',done:s=>s.stats.orders>=10},
+{id:'order50',cat:'订单经营',name:'物流大师',emoji:'🚛',desc:'完成50笔订单',done:s=>s.stats.orders>=50},
+{id:'fish10',cat:'钓鱼大师',name:'湖边常客',emoji:'🎣',desc:'累计钓到10次鱼',done:s=>s.stats.fish>=10},
+{id:'fish100',cat:'钓鱼大师',name:'湖王',emoji:'👑',desc:'累计钓鱼100次',done:s=>s.stats.fish>=100},
+{id:'qualityFish',cat:'钓鱼大师',name:'识鱼达人',emoji:'🐟',desc:'钓到优质或以上鱼苗10次',done:s=>(s.stats.qualityFish||0)>=10},
+{id:'animal10',cat:'畜牧达人',name:'牧场新星',emoji:'🥚',desc:'收取10次动物产品',done:s=>s.stats.animalProducts>=10},
+{id:'market5',cat:'订单经营',name:'小镇摊主',emoji:'🛒',desc:'交易行售出5次',done:s=>s.stats.marketSold>=5},
+{id:'rich',cat:'财富成就',name:'小富农',emoji:'🏆',desc:'金币达到5000',done:s=>s.gold>=5000},
+{id:'rich10000',cat:'财富成就',name:'万元户',emoji:'💎',desc:'金币突破10000',done:s=>s.gold>=10000},
+{id:'techCrop',cat:'特殊成就',name:'农学入门',emoji:'🔬',desc:'完成1级农学研究',done:s=>(s.tech&&s.tech.growth)>=1},
+{id:'techAnimal',cat:'特殊成就',name:'畜牧学者',emoji:'🐄',desc:'完成1级畜牧研究',done:s=>(s.tech&&s.tech.animal)>=1},
+{id:'techFish',cat:'特殊成就',name:'渔业学者',emoji:'🎣',desc:'完成1级渔业研究',done:s=>(s.tech&&s.tech.fish)>=1},
+{id:'techAll',cat:'特殊成就',name:'农业科学院士',emoji:'🏆',desc:'完成综合研究',done:s=>(s.tech&&s.tech.all)>=1}
+]
+let marketView='buy',selectedPlot=null;
+let state=loadState();
+function initState(){return{farmName:'我的农场',gold:600,level:1,exp:0,weather:'晴天',plots:Array.from({length:24},(_,i)=>({unlocked:i<6,crop:null,plantedAt:0,totalTime:0,yield:1})),inventory:{'普通鱼饵':5,'基础饲料':5,'小麦种子':5,'胡萝卜种子':3},animals:[],pond:[],houseLevel:1,pondLevel:1,warehouseLevel:1,rod:'木鱼竿',selectedBait:'普通鱼饵',orders:[],market:[],mySales:[],marketSlots:2,lastOrderRefresh:0,lastMarketRefresh:0,truckBackAt:0,aiFarms:{},friendship:{},daily:{date:'',tasks:[]},tech:{growth:0,animal:0,fish:0,all:0},offlineAppliedAt:Date.now(),v12aNotice:false,v12bNotice:false,v12cNotice:false,v13Notice:false,aiFarms:{},stats:{orders:0,harvests:0,fish:0,pondSold:0,animalProducts:0,marketSold:0,totalIncome:0,totalSpent:0,stolen:0,stolenFromMe:0,maxGold:600,dailyHarvests:0,dailyOrders:0,dailyFish:0,dailyAnimalProducts:0,visits:0,gifts:0,qualityFish:0},logs:[],stealDay:'',stealsFromMeToday:0,lastSeen:Date.now()}}
+function safeJson(v){try{return JSON.parse(v||'null')}catch(e){return null}}
+function findLegacySave(){
+  let found=[];
+  for(let i=0;i<localStorage.length;i++){
+    let k=localStorage.key(i);
+    if(k&&k.startsWith(SAVE_PREFIX)){
+      let data=safeJson(localStorage.getItem(k));
+      if(data&&typeof data==='object')found.push({key:k,data,updatedAt:data.updatedAt||data.saveMeta?.updatedAt||0});
+    }
+  }
+  found.sort((a,b)=>(b.key===SAVE_KEY)-(a.key===SAVE_KEY)||b.updatedAt-a.updatedAt||Number((b.key.match(/V(\d+)/)||[])[1]||0)-Number((a.key.match(/V(\d+)/)||[])[1]||0));
+  return found[0]||null;
+}
+function normalizeState(s,fromKey){
+  let d=initState();
+  s={...d,...(s||{})};
+  s.stats={...d.stats,...(s.stats||{})}; if(!s.stats.maxGold)s.stats.maxGold=s.gold||0;
+  s.inventory=s.inventory||{};
+  s.plots=Array.isArray(s.plots)?s.plots:d.plots;
+  s.plots=s.plots.map((p,i)=>({...d.plots[i%d.plots.length],...(p||{})}));
+  while(s.plots.length<d.plots.length)s.plots.push({...d.plots[s.plots.length]});
+  s.animals=Array.isArray(s.animals)?s.animals.map(a=>({fed:false,feedType:null,feedUntil:0,prodStart:0,growthSeconds:0,lastUpdate:Date.now(),...(a||{})})):[];
+  s.pond=Array.isArray(s.pond)?s.pond:[];
+  s.orders=Array.isArray(s.orders)?s.orders:[];
+  s.market=Array.isArray(s.market)?s.market:[];
+  s.mySales=Array.isArray(s.mySales)?s.mySales:[];
+  s.aiFarms=s.aiFarms||{};s.friendship=s.friendship||{};s.daily=s.daily||{date:'',tasks:[]};s.tech={growth:0,animal:0,fish:0,all:0,...(s.tech||{})};s.offlineAppliedAt=s.offlineAppliedAt||s.lastSeen||Date.now();s.v12aNotice=!!s.v12aNotice;s.v12bNotice=!!s.v12bNotice;s.v12cNotice=!!s.v12cNotice;s.v13Notice=!!s.v13Notice;
+  s.logs=Array.isArray(s.logs)?s.logs:[];
+  s.houseLevel=s.houseLevel||1;s.pondLevel=s.pondLevel||1;s.warehouseLevel=s.warehouseLevel||1;s.rod=s.rod||'木鱼竿';s.selectedBait=s.selectedBait||'普通鱼饵';s.marketSlots=s.marketSlots||2;
+  s.stealDay=s.stealDay||'';s.stealsFromMeToday=s.stealsFromMeToday||0;s.lastSeen=s.lastSeen||Date.now();
+  s.schemaVersion=SCHEMA_VERSION;
+  s.saveMeta={...(s.saveMeta||{}),updatedAt:Date.now(),migratedFrom:fromKey||s.saveMeta?.migratedFrom||SAVE_KEY};
+  return s;
+}
+function loadState(){
+  let current=safeJson(localStorage.getItem(SAVE_KEY));
+  let sourceKey=SAVE_KEY;
+  if(!current){let legacy=findLegacySave(); if(legacy){current=legacy.data; sourceKey=legacy.key;}}
+  if(!current)return initState();
+  let migrated=normalizeState(current,sourceKey);
+  localStorage.setItem(SAVE_KEY,JSON.stringify(migrated));
+  if(sourceKey!==SAVE_KEY) localStorage.setItem(sourceKey+'_BACKUP_BEFORE_MIGRATION',JSON.stringify(current));
+  return migrated;
+}
+function saveGame(){state.lastSeen=Date.now();state.schemaVersion=SCHEMA_VERSION;state.v13Notice=!!state.v13Notice;state.updatedAt=Date.now();state.saveMeta={...(state.saveMeta||{}),updatedAt:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(state));toast('保存成功。')}
+function enterGame(){document.getElementById('cover').style.display='none';document.getElementById('game').style.display='block';applyOfflineProgress();showUpdateNotice();render()}
+function showTab(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));render()}
+function toast(t){alert(t)}
+function syncLogView(){
+  const el=document.getElementById('farmLogs');
+  if(!el)return;
+  el.innerText=(state.logs&&state.logs.length)?state.logs.join('\n'):'暂无日志。';
+}
+function logEvent(text){
+  let time=new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  state.logs=state.logs||[];
+  state.logs.unshift(`[${time}] ${text}`);
+  state.logs=state.logs.slice(0,120);
+  syncLogView();
+}
+function clearFarmLogs(){if(confirm('确定清空农场日志吗？')){state.logs=[];syncLogView();render()}}
+function fmt(sec){sec=Math.max(0,Math.ceil(sec));let m=Math.floor(sec/60),s=sec%60;return m?`${m}分${s}秒`:`${s}秒`}
+function now(){return Date.now()}function needExp(){return state.level*100}function gainExp(x){state.exp+=x;while(state.exp>=needExp()){state.exp-=needExp();state.level++;state.gold+=120;toast('升级到 Lv.'+state.level+'，奖励120金币。')}}
+function cropByName(n){return crops.find(c=>c.name===n)}function animalByName(n){return animalsDef.find(a=>a.name===n)}function fishByName(n){return fishList.find(f=>f.name===n)}function feedByName(n){return feeds.find(f=>f.name===n)||feeds[0]}function rodNow(){return rods.find(r=>r.name===state.rod)||rods[0]}function cropUnlocked(c){return state.level>=c.level}function animalUnlocked(a){return state.level>=a.level}function fishUnlocked(f){return state.level>=f.level}
+function inventoryCount(){return Object.values(state.inventory||{}).reduce((a,b)=>a+b,0)}
+function warehouseCap(){return 60+state.warehouseLevel*40}
+function upgradeWarehouse(){let cost=Math.floor(600*state.warehouseLevel*state.warehouseLevel);if(state.gold<cost)return toast('金币不够，扩建仓库需要'+cost);state.gold-=cost;state.warehouseLevel++;state.stats.totalSpent=(state.stats.totalSpent||0)+cost;logEvent(`花费${cost}金币扩建仓库到Lv.${state.warehouseLevel}。`);gainExp(15);render()}
+function addItem(n,c=1){if(inventoryCount()+c>warehouseCap()){toast('仓库已满，请先扩建仓库。');return false}state.inventory[n]=(state.inventory[n]||0)+c;return true}
+function canAddItem(n,c=1){return inventoryCount()+c<=warehouseCap()}
+function capacityText(c=1){return `仓库容量不足，还需要 ${c} 格空间，请先出售物品或扩建仓库。`}
+function forceAddItem(n,c=1){state.inventory[n]=(state.inventory[n]||0)+c;return true}
+function removeItem(n,c=1){if((state.inventory[n]||0)<c)return false;state.inventory[n]-=c;if(state.inventory[n]<=0)delete state.inventory[n];return true}
+function addGold(x){state.gold+=x;state.stats.totalIncome=(state.stats.totalIncome||0)+x;state.stats.maxGold=Math.max(state.stats.maxGold||0,state.gold)}
+function spendGold(x){state.gold-=x;state.stats.totalSpent=(state.stats.totalSpent||0)+x}
+function todayKey(){return new Date().toDateString()}
+function refreshDailyTasks(force=false){let today=todayKey();if(!force&&state.daily&&state.daily.date===today&&state.daily.tasks&&state.daily.tasks.length)return;state.daily={date:today,tasks:[
+{id:'harvest',name:'收获作物10次',type:'dailyHarvests',target:10,reward:{gold:200},claimed:false},
+{id:'order',name:'完成卡车订单2次',type:'dailyOrders',target:2,reward:{item:'普通鱼饵',count:3},claimed:false},
+{id:'fish',name:'钓鱼5次',type:'dailyFish',target:5,reward:{exp:50},claimed:false},
+{id:'animal',name:'收取动物产品3次',type:'dailyAnimalProducts',target:3,reward:{item:'基础饲料',count:2},claimed:false}
+]};state.stats.dailyHarvests=0;state.stats.dailyOrders=0;state.stats.dailyFish=0;state.stats.dailyAnimalProducts=0;logEvent('每日任务已刷新。');render()}
+function rewardText(r){if(r.gold)return r.gold+'金币';if(r.exp)return '经验'+r.exp;if(r.item)return r.item+'×'+r.count;return '奖励'}
+function claimDaily(id){refreshDailyTasks(false);let t=state.daily.tasks.find(x=>x.id===id);if(!t)return;let cur=state.stats[t.type]||0;if(cur<t.target)return toast('任务还没完成。');if(t.claimed)return toast('已经领取过了。');if(t.reward.item&&!canAddItem(t.reward.item,t.reward.count||1))return toast(capacityText(t.reward.count||1));t.claimed=true;if(t.reward.gold)addGold(t.reward.gold);if(t.reward.exp)gainExp(t.reward.exp);if(t.reward.item)addItem(t.reward.item,t.reward.count||1);logEvent(`领取每日任务「${t.name}」奖励：${rewardText(t.reward)}。`);toast('领取成功：'+rewardText(t.reward));render()}
+function renderDailyTasks(){refreshDailyTasks(false);return state.daily.tasks.map(t=>{let cur=Math.min(state.stats[t.type]||0,t.target);let done=cur>=t.target;return `<div class="item ${t.claimed?'lockedItem':''}"><b>${done?'✅':'□'} ${t.name}</b><p class="muted">${cur}/${t.target}</p><p>奖励：${rewardText(t.reward)}</p><button class="small" ${done&&!t.claimed?'':'disabled'} onclick="claimDaily('${t.id}')">${t.claimed?'已领取':'领取'}</button></div>`}).join('')}
+function renderStats(){let s=state.stats||{};let data=[
+['累计收入',s.totalIncome||0],['累计支出',s.totalSpent||0],['最高金币',s.maxGold||state.gold],
+['累计收获',s.harvests||0],['累计钓鱼',s.fish||0],['累计订单',s.orders||0],
+['动物产品',s.animalProducts||0],['交易售出',s.marketSold||0],
+['仓库等级',state.warehouseLevel||1],['仓库容量',inventoryCount()+'/'+warehouseCap()],
+['农学研究','Lv.'+techLevel('growth')],['畜牧研究','Lv.'+techLevel('animal')],['渔业研究','Lv.'+techLevel('fish')]
+];return data.map(([k,v])=>`<div class="item"><b>${k}</b><div class="emoji">📊</div><p>${v}</p></div>`).join('')}
+function showUpdateNotice(){
+  if(state.v13Notice)return;
+  state.v12aNotice=true;
+  state.v12bNotice=true;
+  state.v12cNotice=true;
+  state.v13Notice=true;
+  logEvent('欢迎来到 V14.5：修复仓库满时购买道具/种子/交易行物品仍扣钱的问题，并保护收获入库逻辑。');
+}
+
+
+
+function escapeHtml(s){
+  return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function foldIdFromTitle(title){
+  // 用稳定 ID 保存折叠状态；去掉括号里的数量，避免“1/10”变化后状态丢失。
+  let base=String(title||'fold').replace(/（.*?）/g,'').replace(/\s+/g,'_');
+  let hash=0;
+  for(let i=0;i<base.length;i++)hash=((hash<<5)-hash)+base.charCodeAt(i),hash|=0;
+  return 'fold_'+Math.abs(hash);
+}
+function foldHtml(title,body,open=false){
+  state.uiFolds=state.uiFolds||{};
+  let id=foldIdFromTitle(title);
+  let isOpen=state.uiFolds[id]!==undefined?state.uiFolds[id]:open;
+  return `<div class="foldBox ${isOpen?'open':''}" id="${id}"><div class="foldHead" onclick="toggleFold('${id}')"><span>${title}</span><span class="foldArrow">${isOpen?'收起':'展开'}</span></div><div class="foldBody">${body}</div></div>`;
+}
+function toggleFold(id){
+  let el=document.getElementById(id);
+  if(!el)return;
+  el.classList.toggle('open');
+  state.uiFolds=state.uiFolds||{};
+  state.uiFolds[id]=el.classList.contains('open');
+  let arrow=el.querySelector('.foldArrow');
+  if(arrow)arrow.textContent=state.uiFolds[id]?'收起':'展开';
+}
+
+const techDefs={
+ growth:{icon:'🌱',name:'农学研究',levels:[
+  {cost:2000,desc:'作物成长时间 -5%',cut:.05},
+  {cost:5000,desc:'作物成长时间 -10%',cut:.10},
+  {cost:12000,desc:'作物成长时间 -15%',cut:.15},
+  {cost:26000,desc:'作物成长时间 -20%，作物产量 +1',cut:.20,yield:1}
+ ]},
+ animal:{icon:'🐄',name:'畜牧研究',levels:[
+  {cost:2200,desc:'动物成长速度 +5%',cut:.05},
+  {cost:5600,desc:'动物成长与产出速度 +10%',cut:.10},
+  {cost:13000,desc:'动物成长与产出速度 +15%',cut:.15},
+  {cost:28000,desc:'动物成长与产出速度 +20%，动物产品价值 +10%',cut:.20,value:.10}
+ ]},
+ fish:{icon:'🎣',name:'渔业研究',levels:[
+  {cost:2200,desc:'鱼苗成长时间 -5%',cut:.05,rare:.03},
+  {cost:5600,desc:'鱼苗成长时间 -10%，稀有鱼概率提升',cut:.10,rare:.06},
+  {cost:13000,desc:'鱼苗成长时间 -15%，稀有鱼概率进一步提升',cut:.15,rare:.09},
+  {cost:28000,desc:'鱼苗成长时间 -20%，鱼塘容量额外提升',cut:.20,rare:.12,cap:2}
+ ]}
+};
+function techLevel(k){state.tech={growth:0,animal:0,fish:0,all:0,...(state.tech||{})};return state.tech[k]||0}
+function techCut(k){let lv=techLevel(k), arr=techDefs[k]?.levels||[];return lv?arr[lv-1].cut||0:0}
+function allBoost(){return techLevel('all')?0.10:0}
+function animalValueBoost(){let lv=techLevel('animal'), arr=techDefs.animal.levels;return (lv?arr[lv-1].value||0:0)+allBoost()}
+function fishRareBoost(){let lv=techLevel('fish'), arr=techDefs.fish.levels;return (lv?arr[lv-1].rare||0:0)+allBoost()*.5}
+function cropYieldBonus(){return techLevel('growth')>=4?1:0}
+function upgradeTech(kind){
+ state.tech={growth:0,animal:0,fish:0,all:0,...(state.tech||{})};
+ if(kind==='all'){
+   if(state.tech.all)return toast('综合研究已完成。');
+   if(state.tech.growth<4||state.tech.animal<4||state.tech.fish<4)return toast('需要农学、畜牧、渔业研究全部满级。');
+   let cost=50000;if(state.gold<cost)return toast('金币不够，综合研究需要'+cost);
+   spendGold(cost);state.tech.all=1;logEvent('完成综合研究：全产业效率提升。');gainExp(200);render();return;
+ }
+ let def=techDefs[kind]; if(!def)return;
+ let next=state.tech[kind]+1;
+ if(next>def.levels.length)return toast(def.name+'已满级。');
+ let data=def.levels[next-1];
+ if(state.gold<data.cost)return toast('金币不够，研究需要'+data.cost+'金币。');
+ spendGold(data.cost);state.tech[kind]=next;logEvent(`完成${def.name} Lv.${next}：${data.desc}。`);gainExp(80);render();
+}
+function renderTechPanel(){
+ state.tech={growth:0,animal:0,fish:0,all:0,...(state.tech||{})};
+ let blocks=Object.entries(techDefs).map(([k,def])=>{
+   let lv=techLevel(k), next=def.levels[lv];
+   let body=`<div class="item"><b>当前效果</b><p class="muted">${lv?def.levels[lv-1].desc:'尚未研究'}</p>${next?`<p><b>下一等级：</b>${next.desc}</p><p class="muted">费用：${next.cost}金币</p><button class="small" onclick="upgradeTech('${k}')">开始研究</button>`:'<p class="muted">已满级。</p>'}</div>`;
+   return foldHtml(`${def.icon} ${def.name} Lv.${lv}/4`,body,false);
+ }).join('');
+ let unlocked=state.tech.growth>=4&&state.tech.animal>=4&&state.tech.fish>=4;
+ let allBody=`<div class="item"><b>农业科学院士</b><p class="muted">农学、畜牧、渔业全部满级后解锁。完成后全产业效率额外提升。</p><button class="small" ${unlocked&&!state.tech.all?'':'disabled'} onclick="upgradeTech('all')">${state.tech.all?'已完成':'开始综合研究'}</button></div>`;
+ blocks+=foldHtml(`🏆 综合研究 ${state.tech.all?'已完成':'未完成'}`,allBody,false);
+ return blocks;
+}
+function qualityName(q){return ['普通','优质','珍稀','传说'][q||0]||'普通'}
+function qualityMul(q){return [1,1.25,1.7,2.4][q||0]||1}
+function qualityEmoji(q){return ['⚪','🟢','🟣','🟡'][q||0]||'⚪'}
+function qualityByFish(f,bait){
+ let r=Math.random()+((bait?.rare||0)*.06)+(rodNow().bonus*.04)+fishRareBoost();
+ if(f.rare>=6&&r>.92)return 3;
+ if(f.rare>=4&&r>.78)return 2;
+ if(r>.62)return 1;
+ return 0;
+}
+function exportSave(){
+ saveGame();
+ let raw=localStorage.getItem(SAVE_KEY)||JSON.stringify(state);
+ prompt('复制下面这段存档文本：', raw);
+}
+function importSave(){
+ let raw=prompt('粘贴存档文本：');
+ if(!raw)return;
+ let data=safeJson(raw);
+ if(!data)return toast('存档格式不正确。');
+ state=normalizeState(data,'IMPORTED_SAVE');
+ localStorage.setItem(SAVE_KEY,JSON.stringify(state));
+ toast('导入成功。');
+ render();
+}
+function resetFarm(){
+ if(!confirm('确定重置农场吗？这会清空当前存档。'))return;
+ localStorage.removeItem(SAVE_KEY);
+ state=initState();
+ toast('已重置农场。');
+ render();
+}
+function renderNoticePanel(){
+ return `<details class="shopFold" open><summary>📜 V14 架构整理版</summary><div class="log">新增：三系研究所、综合研究、鱼苗品质、存档中心、公告中心、分类图鉴与分类成就。本版已改为独立部署网页。</div></details>
+ <details class="shopFold"><summary>📜 V12 系列</summary><div class="log">新增：每日任务、仓库扩建、离线收益、成鱼体系、一键喂食和一键施肥。</div></details>`;
+}
+function renderBookPanel(){
+ const owned=n=>(state.inventory&&state.inventory[n])||0;
+ const cropOwned=crops.filter(c=>cropUnlocked(c)||owned(c.name)>0||owned(seedKey(c.name))>0);
+ const fishOwned=fishList.filter(f=>fishUnlocked(f)||owned(f.name)>0||owned('成鱼·'+f.name)>0);
+ const animalOwned=animalsDef.filter(a=>animalUnlocked(a)||owned(a.product)>0||state.animals.some(x=>x.name===a.name));
+ const productOwned=animalsDef.filter(a=>owned(a.product)>0);
+ const card=(emoji,name,desc,locked=false)=>`<div class="item ${locked?'lockedItem':''}"><div class="emoji">${emoji}</div><b>${escapeHtml(name)}</b><p class="muted">${escapeHtml(desc||'')}</p></div>`;
+ const achCats=[...new Set(achievements.map(a=>a.cat||'特殊成就'))];
+ const achHtml=achCats.map(cat=>{
+   let list=achievements.filter(a=>(a.cat||'特殊成就')===cat);
+   let done=list.filter(a=>a.done(state)).length;
+   let body=`<div class="grid">${list.map(a=>card(a.emoji,a.name,a.desc,!a.done(state))).join('')}</div>`;
+   return foldHtml(`🏆 ${cat}（${done}/${list.length}）`,body,false);
+ }).join('');
+ const cropsBody=`<div class="grid">${cropOwned.map(c=>card(c.emoji,c.name,`Lv.${c.level}｜售价${c.sell}`)).join('')}</div>`;
+ const fishBody=`<div class="grid">${fishOwned.map(f=>card(f.emoji,f.name,`Lv.${f.level}｜成鱼基础价${Math.floor(f.sell*1.8)}`)).join('')}</div>`;
+ const animalBody=`<div class="grid">${animalOwned.map(a=>card(a.emoji,a.name,`Lv.${a.level}｜产出${a.product}`)).join('')}</div>`;
+ const productBody=`<div class="grid">${productOwned.map(a=>card(a.productEmoji,a.product,`来自${a.name}｜售价${itemPrice(a.product)}`)).join('')}</div>`;
+ return `${achHtml}${foldHtml(`🌾 作物图鉴（${cropOwned.length}/${crops.length}）`,cropsBody,false)}${foldHtml(`🐟 鱼类图鉴（${fishOwned.length}/${fishList.length}）`,fishBody,false)}${foldHtml(`🐄 动物图鉴（${animalOwned.length}/${animalsDef.length}）`,animalBody,false)}${foldHtml(`🥛 动物产品图鉴（${productOwned.length}/${animalsDef.length}）`,productBody,false)}`;
+}
+function cropGrowTime(c){return Math.max(20,Math.round(c.time*(1-techCut('growth')-allBoost())))}
+function renameFarm(){let n=prompt('给农场取个名字：',state.farmName);if(n&&n.trim()){logEvent(`农场改名为「${n.trim()}」。`);state.farmName=n.trim();render()}}
+function plotCost(i){return 180+i*45}function unlockPlot(i){if(state.gold<plotCost(i))return toast('金币不够。');state.gold-=plotCost(i);state.plots[i].unlocked=true;logEvent(`花费${plotCost(i)}金币开垦了第${i+1}块土地。`);gainExp(8);render()}
+function seedKey(n){return n+'种子'}function openSeedPicker(i){selectedPlot=i;render()}function closeSeedPicker(){selectedPlot=null;render()}function buySeed(n){let c=cropByName(n);if(!cropUnlocked(c))return toast('等级不足。');let max=Math.max(1,Math.floor(state.gold/c.seed));let q=Number(prompt(`购买 ${seedKey(n)} 的数量：\n单价 ${c.seed} 金币，当前最多可买 ${max} 包。`,'1'));if(!q||q<1)return;q=Math.floor(q);let cost=c.seed*q;if(state.gold<cost)return toast('金币不够。');if(!canAddItem(seedKey(n),q))return toast(capacityText(q));spendGold(cost);addItem(seedKey(n),q);logEvent(`购入${seedKey(n)}×${q}，花费${cost}金币。`);toast(`购买成功：${seedKey(n)}×${q} 已放入仓库。`);render()}function plant(i,n){let c=cropByName(n),p=state.plots[i];if(!p.unlocked||p.crop)return;if(!cropUnlocked(c))return toast('等级不足。');if(!removeItem(seedKey(n),1))return toast('没有'+seedKey(n)+'，先去商店购买。');p.crop=n;p.plantedAt=now();p.totalTime=cropGrowTime(c);p.yield=3+cropYieldBonus();logEvent(`在第${i+1}块地播种了${n}。`);selectedPlot=null;showTab('farm')}
+function cropLeft(p){return p.crop?Math.max(0,p.totalTime-(now()-p.plantedAt)/1000):0}function cropPct(p){return p.crop?Math.min(100,100*(1-cropLeft(p)/p.totalTime)):0}
+function harvest(i){let p=state.plots[i];if(!p.crop)return;if(cropLeft(p)>0)return toast('还没成熟。');let cropName=p.crop;let amount=p.yield||3;if(!addItem(cropName,amount))return;logEvent(`收获了${cropName}×${amount}。`);p.crop=null;p.plantedAt=0;p.totalTime=0;p.yield=1;state.stats.harvests+=amount;state.stats.dailyHarvests=(state.stats.dailyHarvests||0)+1;gainExp(5);render()}
+function harvestAll(){let list=[];state.plots.forEach((p,i)=>{if(p.unlocked&&p.crop&&cropLeft(p)<=0){let amount=p.yield||3;if(addItem(p.crop,amount)){for(let k=0;k<amount;k++)list.push(p.crop);p.crop=null;p.plantedAt=0;p.totalTime=0;p.yield=1;state.stats.harvests+=amount;state.stats.dailyHarvests=(state.stats.dailyHarvests||0)+1;}}});if(!list.length)return toast('目前没有可收入仓库的成熟作物，可能是仓库已满。');let summary={};list.forEach(n=>summary[n]=(summary[n]||0)+1);let text=Object.entries(summary).map(([n,c])=>`${n}×${c}`).join('、');logEvent(`一键收获：${text}。`);gainExp(list.length*5);toast('已收获：'+text);render()}
+function chooseOwnedItem(list,title){
+  let owned=list.filter(x=>(state.inventory[x.name]||0)>0);
+  if(!owned.length)return null;
+  let msg=title+'\n'+owned.map((x,idx)=>`${idx+1}. ${x.name}（库存${state.inventory[x.name]}，${x.desc||''}）`).join('\n');
+  let ans=prompt(msg,'1');
+  return owned[Number(ans)-1]||null;
+}
+
+function batchPlant(){
+  let emptyPlots=state.plots.map((p,i)=>({p,i})).filter(x=>x.p.unlocked&&!x.p.crop);
+  if(!emptyPlots.length)return toast('没有空闲土地。');
+  let seeds=crops.filter(c=>cropUnlocked(c)&&(state.inventory[seedKey(c.name)]||0)>0);
+  if(!seeds.length)return toast('仓库里没有可播种的种子。');
+  let msg='选择种子：\n'+seeds.map((s,i)=>`${i+1}. ${s.name}（库存${state.inventory[seedKey(s.name)]}）`).join('\n');
+  let pick=seeds[Number(prompt(msg,'1'))-1];
+  if(!pick)return;
+  let max=Math.min(emptyPlots.length,state.inventory[seedKey(pick.name)]||0);
+  let raw=prompt(`当前空地${emptyPlots.length}块，${pick.name}种子可播${max}块。\n输入播种数量：`,String(max));
+  let num=parseInt(raw,10);
+  if(!num||num<1)return;
+  num=Math.max(1,Math.min(max,num));
+  let planted=0;
+  for(let i=0;i<state.plots.length&&planted<num;i++){
+    let p=state.plots[i];
+    if(p.unlocked&&!p.crop&&removeItem(seedKey(pick.name),1)){
+      p.crop=pick.name;
+      p.plantedAt=now();
+      p.totalTime=cropGrowTime(pick);
+      p.yield=3+cropYieldBonus();
+      planted++;
+    }
+  }
+  logEvent(`批量播种${pick.name}×${planted}。`);
+  toast(`成功播种${pick.name}×${planted}`);
+  render();
+}
+function fertilizeAll(){
+  let growPlots=state.plots.filter(p=>p.unlocked&&p.crop&&cropLeft(p)>0);
+  if(!growPlots.length)return toast('没有正在生长的作物。');
+  let pick=chooseOwnedItem(fertilizers,'选择用于一键施肥的肥料编号：');
+  if(!pick)return toast('没有选择肥料，或仓库里没有肥料。');
+  let count=Math.min(growPlots.length,state.inventory[pick.name]||0);
+  if(count<=0)return toast('肥料不足。');
+  let used=0;
+  for(const p of state.plots){
+    if(used>=count)break;
+    if(p.unlocked&&p.crop&&cropLeft(p)>0){
+      let left=cropLeft(p);
+      p.plantedAt-=left*1000*pick.cut;
+      used++;
+    }
+  }
+  removeItem(pick.name,used);
+  logEvent(`一键施肥：使用${pick.name}×${used}，加快了${used}块作物生长。`);
+  toast(`一键施肥成功：${pick.name}×${used}`);
+  render();
+}
+function sellItem(n){let price=itemPrice(n);if(!removeItem(n,1))return;addGold(price);logEvent(`出售${n}×1，获得${price}金币。`);render()}
+function useFertilizer(n){let idx=state.plots.findIndex(p=>p.crop&&cropLeft(p)>0);if(idx<0)return toast('没有正在生长的作物。');let it=fertilizers.find(x=>x.name===n);if(!removeItem(n,1))return;let p=state.plots[idx],left=cropLeft(p);p.plantedAt-=left*1000*it.cut;logEvent(`使用${n}，加快了一块作物的生长。`);toast(`${n}已使用，作物生长加快。`);render()}function fertilizePlot(i){let p=state.plots[i];if(!p||!p.crop)return toast('这块地没有作物。');if(cropLeft(p)<=0)return toast('作物已经成熟，不需要施肥。');let owned=fertilizers.filter(f=>(state.inventory[f.name]||0)>0);if(!owned.length)return toast('没有肥料，先去商店购买。');let msg='选择肥料编号：\n'+owned.map((f,idx)=>`${idx+1}. ${f.name}（库存${state.inventory[f.name]}，${f.desc}）`).join('\n');let ans=prompt(msg,'1');let pick=owned[Number(ans)-1];if(!pick)return;removeItem(pick.name,1);let left=cropLeft(p);p.plantedAt-=left*1000*pick.cut;logEvent(`对第${i+1}块地使用${pick.name}，加快了${p.crop}生长。`);toast('施肥成功：'+pick.name+'已使用。');render()}
+function houseCap(){return 3+state.houseLevel*2}function pondCap(){let bonus=(techLevel('fish')>=4?2:0);return 4+state.pondLevel*3+bonus}
+function upgradeHouse(){let cost=Math.floor(800*state.houseLevel*state.houseLevel);if(state.gold<cost)return toast('金币不够，扩建需要'+cost);spendGold(cost);state.houseLevel++;logEvent(`花费${cost}金币扩建动物小屋到Lv.${state.houseLevel}。`);gainExp(20);render()}
+function upgradePond(){let cost=Math.floor(700*state.pondLevel*state.pondLevel);if(state.gold<cost)return toast('金币不够，扩建需要'+cost);spendGold(cost);state.pondLevel++;logEvent(`花费${cost}金币扩建鱼塘到Lv.${state.pondLevel}。`);gainExp(20);render()}
+function buyAnimal(n){let a=animalByName(n);if(!animalUnlocked(a))return toast('等级不足。');if(state.animals.length>=houseCap())return toast('动物小屋满了，先扩建。');if(state.gold<a.cost)return toast('金币不够。');spendGold(a.cost);state.animals.push({name:n,boughtAt:now(),growProgress:0,productProgress:0,feedUntil:0,feedType:null,lastUpdate:now()});logEvent(`购入${n}幼崽，花费${a.cost}金币。`);gainExp(10);toast('购买成功：'+n+'幼崽已放入动物小屋。');render()}
+function normalizeAnimal(obj){if(obj.growProgress===undefined){let d=animalByName(obj.name);obj.growProgress=Math.min(d?d.grow2:0,(now()-(obj.boughtAt||now()))/1000)}if(obj.productProgress===undefined)obj.productProgress=0;if(obj.feedUntil===undefined)obj.feedUntil=obj.fed?now()+60:0;if(obj.lastUpdate===undefined)obj.lastUpdate=now();return obj}
+function updateAnimalProgress(obj){normalizeAnimal(obj);let d=animalByName(obj.name);if(!d)return;let t=now();let last=obj.lastUpdate||t;let activeEnd=Math.min(t,obj.feedUntil||0);let active=Math.max(0,(activeEnd-last)/1000);if(active>0){let feed=feedByName(obj.feedType);let speed=(1+techCut('animal')+allBoost())/(feed.boost||1);if((obj.growProgress||0)<d.grow2){obj.growProgress=Math.min(d.grow2,(obj.growProgress||0)+active*speed)}else{obj.productProgress=(obj.productProgress||0)+active*speed}}obj.lastUpdate=t;if((obj.feedUntil||0)<=t){obj.feedUntil=0;obj.feedType=null}}
+function updateAllAnimals(){(state.animals||[]).forEach(updateAnimalProgress)}
+function animalStage(obj){updateAnimalProgress(obj);let a=animalByName(obj.name),age=obj.growProgress||0;if(age<a.grow1)return {key:'baby',name:a.baby,pct:age/a.grow1*45};if(age<a.grow2)return {key:'young',name:a.young,pct:45+(age-a.grow1)/(a.grow2-a.grow1)*55};return {key:'adult',name:a.adult,pct:100}}
+function feedAnimal(i,feed){let a=state.animals[i];if(!a)return;updateAnimalProgress(a);if(!feed)return toast('请先选择饲料。');let fd=feedByName(feed);if(!removeItem(feed,1))return toast('没有'+feed+'。');a.feedType=feed;a.feedUntil=Math.max(now(),a.feedUntil||0)+fd.duration*1000;a.lastUpdate=now();let st=animalStage(a);logEvent(`给${st.name}喂了${feed}，饲料将维持${fmt(fd.duration)}。`);toast('喂食成功：'+feed+'生效中，剩余 '+fmt((a.feedUntil-now())/1000));render()}
+function feedAllAnimals(){
+  if(!state.animals.length)return toast('动物小屋还没有动物。');
+  let pick=chooseOwnedItem(feeds,'选择用于一键喂食的饲料编号：');
+  if(!pick)return toast('没有选择饲料，或仓库里没有饲料。');
+  let targets=state.animals.filter(a=>feedLeft(a)<=30);
+  if(!targets.length)return toast('所有动物目前都有饲料生效，不需要一键喂食。');
+  let count=Math.min(targets.length,state.inventory[pick.name]||0);
+  if(count<=0)return toast('饲料不足。');
+  let used=0;
+  for(const a of state.animals){
+    if(used>=count)break;
+    updateAnimalProgress(a);
+    if(feedLeft(a)<=30){
+      a.feedType=pick.name;
+      a.feedUntil=Math.max(now(),a.feedUntil||0)+pick.duration*1000;
+      a.lastUpdate=now();
+      used++;
+    }
+  }
+  removeItem(pick.name,used);
+  logEvent(`一键喂食：使用${pick.name}×${used}，喂养了${used}只动物。`);
+  toast(`一键喂食成功：${pick.name}×${used}`);
+  render();
+}
+function animalLeft(a){updateAnimalProgress(a);let d=animalByName(a.name),feed=feedByName(a.feedType);return Math.max(0,d.time*feed.boost-(a.productProgress||0))}
+function feedLeft(a){updateAnimalProgress(a);return Math.max(0,((a.feedUntil||0)-now())/1000)}
+function collectAnimal(i){let a=state.animals[i],d=animalByName(a.name),st=animalStage(a);if(st.key!=='adult')return toast('还没成年，成年后才会产出。');if(feedLeft(a)<=0&&animalLeft(a)>0)return toast('饲料已经耗尽，产出暂停。');if(animalLeft(a)>0)return toast('还没产出，剩余 '+fmt(animalLeft(a)));if(!addItem(d.product,1))return;logEvent(`收取${d.product}×1。`);a.productProgress=0;if(feedLeft(a)<=0){a.feedType=null;a.feedUntil=0}state.stats.animalProducts++;state.stats.dailyAnimalProducts=(state.stats.dailyAnimalProducts||0)+1;gainExp(6);render()}
+function collectAllAnimals(){let collected=[];state.animals.forEach(a=>{let d=animalByName(a.name);if(!d)return;let st=animalStage(a);if(st.key==='adult'&&animalLeft(a)<=0){if(addItem(d.product,1)){collected.push(d.product);a.productProgress=0;if(feedLeft(a)<=0){a.feedType=null;a.feedUntil=0}}}});if(!collected.length)return toast('暂无可收入仓库的动物产品，可能是仓库已满。');let summary={};collected.forEach(n=>summary[n]=(summary[n]||0)+1);let text=Object.entries(summary).map(([n,c])=>`${n}×${c}`).join('、');state.stats.animalProducts+=collected.length;state.stats.dailyAnimalProducts=(state.stats.dailyAnimalProducts||0)+collected.length;gainExp(collected.length*6);logEvent(`一键收取动物产品：${text}。`);toast('已收取：'+text);render()}
+function buyShopItem(n){let item=[...baits,...feeds,...fertilizers].find(x=>x.name===n);let rod=rods.find(x=>x.name===n);if(rod){if(state.level<rod.level)return toast('等级不足。');if(state.rod===rod.name)return toast('已经拥有。');if(state.gold<rod.cost)return toast('金币不够。');spendGold(rod.cost);state.rod=rod.name;logEvent(`购入并装备${rod.name}，花费${rod.cost}金币。`);toast('购买成功：已装备'+rod.name+'。');render();return}if(!item)return toast('没有找到这个道具。');let max=Math.max(1,Math.floor(state.gold/item.cost));let q=Number(prompt(`购买 ${item.name} 的数量：\n单价 ${item.cost} 金币，当前最多可买 ${max} 个。`,'1'));if(!q||q<1)return;q=Math.floor(q);let cost=item.cost*q;if(state.gold<cost)return toast('金币不够。');if(!canAddItem(item.name,q))return toast(capacityText(q));spendGold(cost);addItem(item.name,q);logEvent(`购入${item.name}×${q}，花费${cost}金币。`);toast(`购买成功：${item.name}×${q} 已放入仓库。`);render()}
+function goFishing(){
+ let baitName=document.getElementById('baitSelect').value||state.selectedBait||'普通鱼饵';
+ state.selectedBait=baitName;
+ let bait=baits.find(b=>b.name===baitName)||baits[0];
+ if(state.pond.length>=pondCap())return toast('鱼塘已满，先收入成鱼或扩建鱼塘。');
+ if(!removeItem(bait.name,1))return toast('没有'+bait.name+'，先去商店买。');
+ let log=document.getElementById('fishLog');
+ log.innerText='🎣 你挥杆抛线，浮漂正在轻轻晃动……';
+ setTimeout(()=>{
+   let empty=Math.random()<Math.max(.02,bait.empty-rodNow().bonus*.04-fishRareBoost()*.2);
+   if(empty){log.innerText='水面动了一下，但这次空军了。';logEvent('钓鱼空军，没有钓到鱼苗。');render();return}
+   let pool=fishList.filter(f=>fishUnlocked(f));
+   let weight=Math.random()+bait.rare*.06+rodNow().bonus*.04+fishRareBoost();
+   let fish=pool[Math.min(pool.length-1,Math.floor(Math.pow(weight,1.8)*pool.length))]||pool[0];
+   let q=qualityByFish(fish,bait);
+   let grow=Math.max(60,Math.round(fish.grow*(1-techCut('fish')-allBoost())));
+   state.pond.push({name:fish.name,start:now(),time:grow,quality:q});
+   if(q>=1)state.stats.qualityFish=(state.stats.qualityFish||0)+1;
+   log.innerText=`钓到了 ${qualityEmoji(q)}${qualityName(q)} ${fish.emoji}${fish.name}鱼苗，已自动放入鱼塘。`;
+   logEvent(`钓到${qualityName(q)}${fish.name}鱼苗，已放入鱼塘。`);
+   state.stats.fish++;state.stats.dailyFish=(state.stats.dailyFish||0)+1;gainExp(6+q*3);render()
+ },2500)
+}
+function storePondFish(i){let p=state.pond[i],left=p.time-(now()-p.start)/1000;if(left>0)return toast('还没长成，剩余 '+fmt(left));let adult=(p.quality&&p.quality>0?qualityName(p.quality)+'·':'')+'成鱼·'+p.name;if(!addItem(adult,1))return;logEvent(`从鱼塘收获${adult}×1并收入仓库。`);state.pond.splice(i,1);gainExp(5);render()}
+function storeAllPond(){let stored=[];state.pond=state.pond.filter(p=>{let left=p.time-(now()-p.start)/1000;if(left>0)return true;let adult=(p.quality&&p.quality>0?qualityName(p.quality)+'·':'')+'成鱼·'+p.name;if(addItem(adult,1)){stored.push(adult);return false}return true});if(!stored.length)return toast('暂无可收入仓库的成鱼。');let summary={};stored.forEach(n=>summary[n]=(summary[n]||0)+1);let text=Object.entries(summary).map(([n,c])=>`${n}×${c}`).join('、');gainExp(stored.length*5);logEvent(`鱼塘收获成鱼入库：${text}。`);toast(`已收入仓库：${text}`);render()}
+function generateOrders(){let pool=[...crops.filter(c=>cropUnlocked(c)).map(c=>c.name),...animalsDef.filter(a=>animalUnlocked(a)).map(a=>a.product),...fishList.filter(f=>fishUnlocked(f)).map(f=>'成鱼·'+f.name)];state.orders=Array.from({length:3},()=>{let used=[];let len=2+Math.floor(Math.random()*2);let need=Array.from({length:len},()=>{let item=pool[Math.floor(Math.random()*pool.length)];used.push(item);return{name:item,count:1+Math.floor(Math.random()*3)}});return{id:Date.now()+Math.random(),need,reward:orderReward(need)}});state.lastOrderRefresh=now()}
+
+function orderNeedStatus(o){return o.need.map(n=>{let have=state.inventory[n.name]||0;let lack=Math.max(0,n.count-have);return {...n,have,lack,ok:lack<=0}})}
+function canFinishOrder(o){return orderNeedStatus(o).every(n=>n.ok)&&now()>=state.truckBackAt}
+function tryRefreshOrders(){if(now()-state.lastOrderRefresh<FIVE)return toast('订单还没刷新，剩余 '+fmt((FIVE-(now()-state.lastOrderRefresh))/1000));generateOrders();render()}
+function finishOrder(id){if(now()<state.truckBackAt)return toast('卡车还没回来，剩余 '+fmt((state.truckBackAt-now())/1000));let o=state.orders.find(x=>x.id===id);if(!o)return;for(const n of o.need){if((state.inventory[n.name]||0)<n.count)return toast('仓库材料不够。')}o.need.forEach(n=>removeItem(n.name,n.count));addGold(o.reward);state.stats.orders++;state.stats.dailyOrders=(state.stats.dailyOrders||0)+1;logEvent(`完成卡车订单，提交${o.need.map(n=>n.name+'×'+n.count).join('、')}，获得${o.reward}金币。`);state.truckBackAt=now()+FIVE;state.orders=state.orders.filter(x=>x.id!==id);gainExp(20);render()}
+function getFriendFarmForMarket(f){if(!f)return null;if(!state.aiFarms[f.id])state.aiFarms[f.id]=createAIFarm(f);state.aiFarms[f.id]=mutateFarm(state.aiFarms[f.id]);return state.aiFarms[f.id]}
+function friendMarketGoods(farm){let goods=[];(farm.crops||[]).forEach(c=>{if(c.count>0)goods.push({item:c.name,count:Math.max(1,Math.min(c.count,1+Math.floor(Math.random()*5))),kind:'crop',ready:c.mature})});(farm.animals||[]).forEach(a=>{let d=animalByName(a.name);if(d)goods.push({item:d.product,count:1+Math.floor(Math.random()*3),kind:'animal',ready:a.ready})});(farm.fish||[]).forEach(f=>{if(f.count>0)goods.push({item:f.name,count:Math.max(1,Math.min(f.count,1+Math.floor(Math.random()*2))),kind:'fish',ready:f.ready})});return goods}
+function npcMarketGoods(){
+  const pool=[
+    ...crops.filter(c=>cropUnlocked(c)).map(c=>({item:c.name,kind:'crop'})),
+    ...animalsDef.filter(a=>animalUnlocked(a)).map(a=>({item:a.product,kind:'animal'})),
+    ...fishList.filter(f=>fishUnlocked(f)).map(f=>({item:'成鱼·'+f.name,kind:'fish'})),
+    ...baits.map(b=>({item:b.name,kind:'tool'})),
+    ...feeds.map(f=>({item:f.name,kind:'tool'})),
+    ...fertilizers.map(f=>({item:f.name,kind:'tool'}))
+  ];
+  return pool.length?pool:[{item:'小麦',kind:'crop'}];
+}
+function refreshMarket(){
+  const sellers=[
+    {owner:'南山农户',farmName:'南山小集'},
+    {owner:'清溪农场主',farmName:'清溪摊位'},
+    {owner:'风车镇商人',farmName:'风车镇货架'},
+    {owner:'月光湖渔夫',farmName:'湖畔鱼铺'},
+    {owner:'谷仓老板',farmName:'谷仓补给站'},
+    {owner:'路过的旅商',farmName:'旅商小车'}
+  ];
+  const pool=npcMarketGoods();
+  state.market=Array.from({length:6},()=>{
+    const g=pool[Math.floor(Math.random()*pool.length)];
+    const seller=sellers[Math.floor(Math.random()*sellers.length)];
+    const count=1+Math.floor(Math.random()*(g.kind==='tool'?3:5));
+    const price=Math.round(marketPrice(g.item,count,'npc')*(g.kind==='fish'?1.08:1));
+    return {id:String(Math.random()),item:g.item,count,price,seller:seller.owner,owner:seller.owner,farmName:seller.farmName,kind:g.kind};
+  });
+  state.lastMarketRefresh=now();
+}
+function tryRefreshMarket(){if(now()-state.lastMarketRefresh<FIVE)return toast('交易行还没刷新，剩余 '+fmt((FIVE-(now()-state.lastMarketRefresh))/1000));refreshMarket();render()}
+function buyMarket(id){let m=state.market.find(x=>x.id===id);if(!m)return;if(state.gold<m.price)return toast('金币不够。');if(!canAddItem(m.item,m.count))return toast(capacityText(m.count));spendGold(m.price);addItem(m.item,m.count);let sellerName=m.owner||m.seller||'农户';let farmName=m.farmName||'小镇摊位';logEvent(`在交易行从${sellerName}的${farmName}购买${m.item}×${m.count}，花费${m.price}金币。`);toast(`购买成功：${m.item}×${m.count} 已进入仓库。`);state.market=state.market.filter(x=>x.id!==id);render()}
+function marketUsed(){return state.mySales.filter(s=>!s.sold).length}function expandMarketSlots(){let cost=500*state.marketSlots;if(state.gold<cost)return toast('金币不够，扩建摊位需要'+cost);state.gold-=cost;state.marketSlots++;logEvent(`花费${cost}金币扩建交易行摊位到${state.marketSlots}个。`);gainExp(12);render()}function listForSale(n){let max=state.inventory[n]||0;if(!max)return;if(marketUsed()>=state.marketSlots)return toast('摊位已满，先等卖出/下架，或花金币扩建。');let count=Number(prompt('上架数量：',1));if(!count||count<1||count>max)return;let suggest=marketPrice(n,count,'player');let price=Number(prompt('总售价（交易行小额，建议 '+suggest+' 金币，可自己调整）：',suggest));if(!price)return;removeItem(n,count);state.mySales.push({id:String(Math.random()),item:n,count,price,sold:false,listedAt:now(),checks:0});logEvent(`上架${n}×${count}到交易行，售价${price}金币。`);render()}
+function checkMySales(){let sold=[];state.mySales.forEach(s=>{if(!s.sold){s.checks=(s.checks||0)+1;let chance=Math.min(.45,.18+s.checks*.06);if(Math.random()<chance){s.sold=true;addGold(s.price);state.stats.marketSold++;sold.push(s.item+'×'+s.count)}}});if(sold.length){logEvent(`交易行售出${sold.join('、')}，金币已到账。`)}else{logEvent('查看交易行摊位，这次无人购买。')}toast(sold.length?'售出：'+sold.join('，')+'。金币已到账，摊位已空出。':'这次无人购买，再等等吧。');render()}function removeSale(id){let s=state.mySales.find(x=>x.id===id);if(!s)return;if(!s.sold){if(!addItem(s.item,s.count))return;logEvent(`下架${s.item}×${s.count}，物品已回仓库。`)}else{logEvent(`清除了${s.item}×${s.count}的已售出记录。`)}state.mySales=state.mySales.filter(x=>x.id!==id);render()}
+// 独立部署版：已移除好友农场、读取聊天器角色与偷菜逻辑。
+function itemCategory(n){
+  if(cropByName(n)||crops.some(c=>seedKey(c.name)===n)) return '作物';
+  if(fishByName(n)||String(n).includes('成鱼·')) return '鱼类';
+  if(animalsDef.some(a=>a.product===n)) return '动物产品';
+  return '消耗品';
+}
+function renderInventoryCategory(title,items){
+  if(!items.length)return `<details class="shopFold"><summary>${title}（0）</summary><p class="muted">暂无物品。</p></details>`;
+  return `<details class="shopFold" open><summary>${title}（${items.length}类）</summary>${items.map(([n,c])=>`<div class="between"><span>${n} × ${c} <span class="muted">单价${itemPrice(n)}金币</span></span><span>${fertilizers.some(f=>f.name===n)?`<button class="small" onclick="useFertilizer('${n}')">使用</button>`:''}<button class="small" onclick="listForSale('${n}')">上架</button></span></div>`).join('')}</details>`;
+}
+function renderWarehouse(){
+  let entries=Object.entries(state.inventory||{});
+  if(!entries.length)return '<p class="muted">仓库还是空的。</p>';
+  let groups={'作物':[], '鱼类':[], '动物产品':[], '消耗品':[]};
+  entries.forEach(e=>groups[itemCategory(e[0])].push(e));
+  return renderInventoryCategory('🌾 作物',groups['作物'])+renderInventoryCategory('🐟 鱼类',groups['鱼类'])+renderInventoryCategory('🥚 动物产品',groups['动物产品'])+renderInventoryCategory('🛒 消耗品',groups['消耗品']);
+}
+function applyOfflineProgress(){
+  let last=state.lastSeen||Date.now();
+  let away=Math.max(0,Date.now()-last);
+  if(away<60000)return;
+  let capped=Math.min(away,24*60*60*1000);
+  updateAllAnimals();
+
+  let cropsStored=[], fishStored=[], animalStored=[];
+  // 超过8小时自动收获；不足8小时只推进成长
+  if(away>=8*60*60*1000){
+    state.plots.forEach(p=>{
+      if(p.unlocked&&p.crop&&cropLeft(p)<=0){
+        let amount=p.yield||3;
+        if(addItem(p.crop,amount)){
+          for(let i=0;i<amount;i++)cropsStored.push(p.crop);
+          p.crop=null;p.plantedAt=0;p.totalTime=0;p.yield=1;
+          state.stats.harvests=(state.stats.harvests||0)+amount;
+        }
+      }
+    });
+    state.pond=state.pond.filter(p=>{
+      let left=p.time-(now()-p.start)/1000;
+      if(left>0)return true;
+      let adult=(p.quality&&p.quality>0?qualityName(p.quality)+'·':'')+'成鱼·'+p.name;
+      if(addItem(adult,1)){fishStored.push(adult);return false}
+      return true;
+    });
+    state.animals.forEach(a=>{
+      let d=animalByName(a.name); if(!d)return;
+      let st=animalStage(a);
+      if(st.key==='adult'&&animalLeft(a)<=0){
+        if(addItem(d.product,1)){
+          animalStored.push(d.product);
+          a.productProgress=0;
+          state.stats.animalProducts=(state.stats.animalProducts||0)+1;
+        }
+      }
+    });
+  }
+
+  let hours=Math.floor(away/3600000), mins=Math.floor((away%3600000)/60000);
+  let summary=[];
+  if(cropsStored.length)summary.push('作物入仓'+cropsStored.length+'份');
+  if(fishStored.length)summary.push('成鱼入仓'+fishStored.length+'条');
+  if(animalStored.length)summary.push('动物产品入仓'+animalStored.length+'份');
+  let msg=`离线了${hours?hours+'小时':''}${mins}分钟，已按最多24小时推进成长${summary.length?'，并自动收获：'+summary.join('、'):'。'}`;
+  logEvent(msg);
+  if(away>=8*60*60*1000)setTimeout(()=>toast(msg),700);
+}
+function render(){syncLogView();state.stats.maxGold=Math.max(state.stats.maxGold||0,state.gold);refreshDailyTasks(false);updateAllAnimals();if(!state.orders.length)generateOrders();if(!state.market.length)refreshMarket();document.getElementById('farmTitle').innerText='🌿 '+state.farmName;document.getElementById('farmNameView').innerText=state.farmName;document.getElementById('gold').innerText=state.gold;document.getElementById('level').innerText=state.level;document.getElementById('exp').innerText=state.exp;document.getElementById('needExp').innerText=needExp();document.getElementById('weather').innerText=state.weather;
+ if(document.getElementById('dailyTasks'))document.getElementById('dailyTasks').innerHTML=renderDailyTasks();
+ if(document.getElementById('statsPanel'))document.getElementById('statsPanel').innerHTML=renderStats();
+ if(document.getElementById('techPanel')&&!document.getElementById('techPanel').dataset.loaded){document.getElementById('techPanel').innerHTML=renderTechPanel();document.getElementById('techPanel').dataset.loaded='1';}
+ if(document.getElementById('bookPanel')&&!document.getElementById('bookPanel').dataset.loaded){document.getElementById('bookPanel').innerHTML=renderBookPanel();document.getElementById('bookPanel').dataset.loaded='1';}
+ if(document.getElementById('noticePanel')&&!document.getElementById('noticePanel').dataset.loaded){document.getElementById('noticePanel').innerHTML=renderNoticePanel();document.getElementById('noticePanel').dataset.loaded='1';}
+ if(document.getElementById('warehouseLevel'))document.getElementById('warehouseLevel').innerText=state.warehouseLevel||1;
+ if(document.getElementById('warehouseCap'))document.getElementById('warehouseCap').innerText=inventoryCount()+'/'+warehouseCap();
+
+ document.getElementById('seedPicker').innerHTML=selectedPlot!==null?`<div class="card"><div class="between"><h3>选择要播种的种子</h3><button class="small secondary" onclick="closeSeedPicker()">取消</button></div><p class="muted">只显示你仓库里拥有的种子，点击后会自动播种并回到农地。</p><div class="grid">${crops.filter(c=>(state.inventory[seedKey(c.name)]||0)>0&&cropUnlocked(c)).map(c=>`<div class="item"><div class="emoji">${c.emoji}</div><b>${c.name}</b><p class="muted">拥有 ${state.inventory[seedKey(c.name)]||0} 包｜${fmt(cropGrowTime(c))}成熟</p><button class="small" onclick="plant(${selectedPlot},'${c.name}')">播种</button></div>`).join('')||'<p class="muted">你还没有可播种的种子，先去商店购买。</p>'}</div></div>`:'';document.getElementById('plots').innerHTML=state.plots.map((p,i)=>{if(!p.unlocked)return`<div class="tile locked"><div class="emoji">🌿</div><b>未开垦荒地</b><p class="muted">需要 ${plotCost(i)} 金币</p><button class="small" onclick="unlockPlot(${i})">开垦</button></div>`;if(p.crop){let pct=cropPct(p),left=cropLeft(p);return`<div class="tile"><div class="emoji">${cropByName(p.crop).emoji}</div><b>${p.crop}</b><div class="bar"><span style="width:${pct}%"></span></div><p class="muted">${left<=0?'成熟了':'剩余 '+fmt(left)}</p>${left>0?`<button class="small secondary" onclick="fertilizePlot(${i})">施肥</button>`:''}<button class="small" onclick="harvest(${i})">收获</button></div>`}return`<div class="tile empty" onclick="openSeedPicker(${i})"><div class="emoji">🟫</div><b>空地</b><p class="muted">点击播种</p><button class="small" onclick="event.stopPropagation();openSeedPicker(${i})">播种</button></div>`}).join('');
+ document.getElementById('inventory').innerHTML=renderWarehouse();
+ document.getElementById('orders').innerHTML=state.orders.map(o=>{let can=canFinishOrder(o);return `<div class="item"><b>订单 #${String(o.id).slice(-4)}</b><p>${o.need.map(n=>`${n.name}×${n.count}`).join('，')}</p><p class="muted">奖励 ${o.reward} 金币</p><button class="small" ${can?'':'disabled'} onclick="finishOrder(${o.id})">${now()<state.truckBackAt?'卡车未回来':(can?'发车':'材料不足')}</button></div>`}).join('');document.getElementById('orderCd').innerText=(now()<state.truckBackAt?'卡车回来倒计时：'+fmt((state.truckBackAt-now())/1000)+'\n':'')+(now()-state.lastOrderRefresh<FIVE?'订单刷新倒计时：'+fmt((FIVE-(now()-state.lastOrderRefresh))/1000):'可以刷新订单了。');
+ document.getElementById('marketArea').innerHTML=marketView==='buy'?`<div class="grid">${state.market.map(m=>{let sellerName=m.owner||m.seller||'农户';let farmName=m.farmName||'小镇摊位';return `<div class="item"><b>${m.item}×${m.count}</b><p class="muted">${sellerName}的${farmName}</p><p>${m.price}金币</p><button class="small" onclick="buyMarket('${m.id}')">购买</button></div>`}).join('')}</div>`:`<div class="between"><p class="muted">摊位：${marketUsed()}/${state.marketSlots}（已售出的不占摊位）</p><button class="small secondary" onclick="expandMarketSlots()">扩建摊位 ${500*state.marketSlots}金币</button></div><div class="grid">${state.mySales.map(s=>`<div class="item"><b>${s.item}×${s.count}</b><p>${s.price}金币</p><p class="muted">${s.sold?'已被买走，摊位已空出':'正在售卖｜查看次数 '+(s.checks||0)}</p><button class="small secondary" onclick="removeSale('${s.id}')">${s.sold?'清除记录':'下架'}</button></div>`).join('')||'<p class="muted">暂无上架商品。</p>'}</div>`;document.getElementById('marketCd').innerText=now()-state.lastMarketRefresh<FIVE?'交易行刷新倒计时：'+fmt((FIVE-(now()-state.lastMarketRefresh))/1000):'可以刷新交易行了。';
+ document.getElementById('shopSeeds').innerHTML=crops.map(c=>{let ok=cropUnlocked(c);return`<div class="item ${ok?'':'lockedItem'}"><div class="emoji">${c.emoji}</div><b>${c.name}</b><p class="muted">${fmt(cropGrowTime(c))}成熟｜${c.seed}金币</p><p class="muted">${ok?'已解锁':'Lv.'+c.level+' 解锁'}</p><button class="small" ${ok?'':'disabled'} onclick="buySeed('${c.name}')">购买种子</button></div>`}).join('');
+ document.getElementById('shopAnimals').innerHTML=animalsDef.map(a=>{let ok=animalUnlocked(a);return`<div class="item ${ok?'':'lockedItem'}"><div class="emoji">${a.emoji}</div><b>${a.name}</b><p class="muted">${a.baby}→${a.young}→${a.adult}</p><p class="muted">${a.cost}金币｜产出${a.product}｜单价${itemPrice(a.product)}</p><p class="muted">${ok?'已解锁':'Lv.'+a.level+' 解锁'}</p><button class="small" ${ok?'':'disabled'} onclick="buyAnimal('${a.name}')">购买</button></div>`}).join('');
+ document.getElementById('shopItems').innerHTML=[...baits,...feeds,...fertilizers].map(it=>`<div class="item"><div class="emoji">${it.emoji}</div><b>${it.name}</b><p class="muted">${it.desc}</p><p>${it.cost}金币</p><button class="small" onclick="buyShopItem('${it.name}')">购买</button></div>`).join('')+rods.map(r=>`<div class="item ${state.level>=r.level?'':'lockedItem'}"><div class="emoji">${r.emoji}</div><b>${r.name}</b><p class="muted">Lv.${r.level}｜珍稀加成+${r.bonus}</p><p>${r.cost}金币</p><button class="small" ${state.level>=r.level?'':'disabled'} onclick="buyShopItem('${r.name}')">${state.rod===r.name?'已装备':'购买/装备'}</button></div>`).join('');
+ document.getElementById('houseLevel').innerText=state.houseLevel;document.getElementById('houseCap').innerText=`${state.animals.length}/${houseCap()}`;document.getElementById('animals').innerHTML=state.animals.length?state.animals.map((a,i)=>{let d=animalByName(a.name),st=animalStage(a),fleft=feedLeft(a),left=st.key==='adult'?animalLeft(a):0;let pct=st.key==='adult'?(left<=0?100:Math.min(100,100*(1-left/(d.time*(feedByName(a.feedType).boost||1))))):st.pct;let status=st.key!=='adult'?(fleft>0?`成长中：${Math.floor(st.pct)}%｜饲料剩余 ${fmt(fleft)}`:`成长暂停：${Math.floor(st.pct)}%｜需要喂饲料`):(fleft>0?(left<=0?`可收取${d.product}｜饲料剩余 ${fmt(fleft)}`:`产出剩余 ${fmt(left)}｜饲料剩余 ${fmt(fleft)}`):(left<=0?`可收取${d.product}`:'未喂食，产出暂停'));return`<div class="item"><div class="emoji">${d.emoji}</div><b>${st.name}</b><div class="bar"><span style="width:${pct}%"></span></div><p class="muted">${status}</p><div class="feedChoices">${feeds.map(f=>`<button class="small secondary" ${(state.inventory[f.name]||0)>0?'':'disabled'} onclick="feedAnimal(${i},'${f.name}')">喂 ${f.name} <span class="muted">库存${state.inventory[f.name]||0}｜维持${fmt(f.duration)}</span></button>`).join('')}</div><button class="small" onclick="collectAnimal(${i})">收取</button></div>`}).join(''):'<p class="muted">还没有动物，去商店购买。</p>'; document.getElementById('pondLevel').innerText=state.pondLevel;document.getElementById('pondCap').innerText=`${state.pond.length}/${pondCap()}`;let baitEl=document.getElementById('baitSelect');if(baitEl){let current=state.selectedBait||baitEl.value||'普通鱼饵';baitEl.innerHTML=baits.map(b=>`<option value="${b.name}">${b.name}（库存${state.inventory[b.name]||0}）</option>`).join('');baitEl.value=current;if(!baitEl.value)baitEl.value='普通鱼饵';state.selectedBait=baitEl.value;baitEl.onchange=()=>{state.selectedBait=baitEl.value;};}document.getElementById('pond').innerHTML=state.pond.length?state.pond.map((p,i)=>{let f=fishByName(p.name),left=p.time-(now()-p.start)/1000,pct=Math.min(100,100*(1-left/p.time));return`<div class="item"><div class="emoji">${f.emoji}</div><b>${p.name}鱼苗</b><div class="bar"><span style="width:${pct}%"></span></div><p class="muted">${left<=0?'已长成，售价 '+Math.floor(itemPrice(p.name)*1.8):'剩余 '+fmt(left)}</p><button class="small" onclick="storePondFish(${i})">收入仓库</button></div>`}).join(''):'<p class="muted">鱼塘暂无鱼苗。</p>';
+
+ // V14 已改用 bookPanel 统一渲染图鉴与成就，旧版 achievements/cropBook/fishBook/animalBook 容器已移除。
+ let logEl=document.getElementById('farmLogs');if(logEl)logEl.innerText=(state.logs&&state.logs.length)?state.logs.join('\n'):'暂无日志。';}
+window.onload=()=>{applyOfflineProgress();if((state.market||[]).some(m=>/AI|神秘卖家/.test(m.seller||'')||/AI|神秘卖家/.test(m.owner||''))){state.market=[];state.lastMarketRefresh=0;}render();setInterval(()=>{try{render()}catch(e){console.error(e)}},1000)};window.addEventListener('beforeunload',()=>{state.lastSeen=Date.now();state.schemaVersion=SCHEMA_VERSION;state.updatedAt=Date.now();state.saveMeta={...(state.saveMeta||{}),updatedAt:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(state));});
+
+// V13 final safety overrides
+function cropGrowTime(c){return Math.max(20,Math.round(c.time*(1-techCut('growth')-allBoost())))}
+
+
+let liveTimer=null;
+function startLiveTimer(){
+  if(liveTimer)return;
+  liveTimer=setInterval(()=>{try{render()}catch(e){console.error(e)}},1000);
+}
+
+
+function refreshCountdownsOnly(){
+  try{
+    document.querySelectorAll('[data-left]').forEach(el=>{
+      let t=Math.max(0,Math.ceil(Number(el.dataset.left)-1));
+      el.dataset.left=t;
+      el.textContent=t>0?fmt(t):'已完成';
+    });
+  }catch(e){}
+}
+setInterval(()=>{
+  try{
+    refreshCountdownsOnly();
+  }catch(e){
+    console.error('countdown timer error',e);
+  }
+},1000);
+
+</script>
+</body>
+</html>
